@@ -7,7 +7,8 @@ function Register() {
         ime: '',
         email: '',
         lozinka: '',
-        confirmLozinka: ''
+        confirmLozinka: '',
+        role: 'user' // Default role
     });
 
     const [errors, setErrors] = useState({});
@@ -24,7 +25,7 @@ function Register() {
         setErrors({});
         setLoading(true);
 
-        // Validacija
+        // Validation
         const newErrors = {};
         if (!formData.ime.trim()) newErrors.ime = 'Ime je obavezno';
         if (!formData.email.trim()) newErrors.email = 'Email je obavezan';
@@ -46,6 +47,7 @@ function Register() {
                     ime: formData.ime,
                     email: formData.email,
                     lozinka: formData.lozinka,
+                    role: formData.role
                 },
                 {
                     headers: {
@@ -60,7 +62,11 @@ function Register() {
                 setErrors({ api: response.data.message || "Registracija nije uspjela." });
             }
         } catch (err) {
-            setErrors({ api: "Greška prilikom spajanja na server." });
+            console.error("Registration error:", err);
+            setErrors({
+                api: err.response?.data?.message ||
+                    "Greška prilikom spajanja na server."
+            });
         } finally {
             setLoading(false);
         }
@@ -122,6 +128,19 @@ function Register() {
                     onChange={handleChange}
                 />
                 {errors.confirmLozinka && <span className="error-message">{errors.confirmLozinka}</span>}
+            </div>
+
+            <div className="form-group">
+                <label>Uloga</label>
+                <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="role-select"
+                >
+                    <option value="user">Korisnik</option>
+                    <option value="admin">Administrator</option>
+                </select>
             </div>
 
             <button type="submit" disabled={loading}>
